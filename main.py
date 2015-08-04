@@ -4,16 +4,29 @@ import settings              # access globals
 import render                # rendering utils
 import time                  # loop timing
 from sticks import stick, stick_manager
+from bugs import bug, bug_manager
+from map_manager import map_manager  # entity management
 
 old_mess = []
 
 def main():
     # create window
     settings.disp_dim = (1024, 855)
+    
 
+    stick_man = stick_manager()
+    bug_man = bug_manager()
+    settings.map_man = map_manager(stick_man = stick_man,
+                                   bug_man = bug_man)
     # spawn initial sticks
-    settings.stick_man = stick_manager()
-    settings.stick_man.spawnSticks(2)
+    stick_man.spawnSticks(2)
+    # debug
+    special_stk = stick(location=(512, 427), rotation=0.785, 
+                    lspeed=0, rspeed=0, length=1000.0,
+                    color=(255,100,100))
+    stick_man.getSticks().append(special_stk)
+    special_bug = bug(location=(512,427))
+    special_direction = 0.785
 
     render.initWindow()
     sys_font = pygame.font.SysFont(None, 25)
@@ -28,7 +41,13 @@ def main():
     count = 0
     # main loop
     while True:
+        colliders = settings.map_man.sightDistance(special_bug,
+                                                   special_direction)
+        for stk in colliders:
+            stk.color = (50, 100, 255)
         loop()
+        for stk in colliders:
+            stk.color = settings.white
         fps_clock.tick()
         count += 1
         if count >= 15:
@@ -42,9 +61,9 @@ def main():
                 return
 
 def loop():
-    settings.stick_man.tick()
-    t_sticks = settings.stick_man.sticks
+    settings.map_man.tick()
     settings.screen.fill( settings.black )
+    t_sticks = settings.map_man.stick_man.getSticks()
     render.drawSticks( t_sticks )
     settings.screen.blit(settings.fps_surf, settings.fps_dest)
     pygame.display.update()

@@ -5,12 +5,14 @@ import math
 
 class stick:
     def __init__(self, location=None, rotation=None, lspeed=None, rspeed=None,
-                 max_length=130.0, min_length=80.0):
+                 max_length=130.0, min_length=80.0, length=None, color=None):
         if location is None:
             edgebuf = max_length / 2.0
             min_loc = edgebuf
             max_loc = settings.disp_dim[0] - edgebuf
             self.location = (random.randrange(int(min_loc), int(max_loc), 1), 0.0)
+        else:
+            self.location = location
 
         # linear velocity
         if lspeed is None:
@@ -28,14 +30,20 @@ class stick:
 
         if rotation is None:
             self.rotation = random.randrange(0, 314, 2) / 100.0
+        else:
+            self.rotation = rotation
 
-        self.length = random.randrange(min_length * 5, max_length * 5, 2) / 5.0
-        """
-        if settings.debug > 2:
-            print(">>  Stick created with length: {}".format(self.length))
-            print(">>   at location: {}".format(self.location))
-            print(">>   with rotation: {}".format(self.rotation))
-        """
+        if length is None:
+            self.length = random.randrange(min_length * 5, max_length * 5, 2) / 5.0
+        else:
+            self.length = length
+
+        if color is None:
+            self.color = settings.white
+        else:
+            self.color = color
+
+        self.dim_dict = None
     
     def tick(self):
         self.dim_dict = None
@@ -74,6 +82,7 @@ class stick_manager:
         self.min_num = min_num
         self.probability = density / 10.0
         self.sticks = []
+        self.pointMap = None
 
         random.seed()
         self.randState = random.getstate()
@@ -98,6 +107,21 @@ class stick_manager:
         for stk in doomed:
             self.sticks.remove(stk)
         self.randState = random.getstate()
+        self.pointMap = None
+
+    def aggregatePoints(self):
+
+        if self.pointMap is None:
+            self.pointMap = []
+            for stk in self.sticks:
+                dims = stk.getDimensions()
+                data = {'start': dims.get('start'), 
+                        'stop': dims.get('stop'),
+                        'stick': stk }
+                self.pointMap.append(data)
+
+        return self.pointMap
+
 
     def spawnSticks(self, num_sticks):
         if num_sticks <= 0:

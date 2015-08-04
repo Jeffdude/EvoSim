@@ -17,7 +17,7 @@ def initWindow(fullscreen=False):
     if settings.debug:
         print("~ Initializing pygame window")
     pygame.init()
-    pygame.display.set_caption('Parcae')
+    pygame.display.set_caption('EvoSim 1.0')
     dispInfo = pygame.display.Info()
     if settings.debug > 1:
         print(">   Available Height: {}".format(dispInfo.current_h))
@@ -48,7 +48,7 @@ def drawSticks(sticks, color=settings.white):
         stk_info = stk.getDimensions()
         start = stk_info.get('start')
         stop = stk_info.get('stop')
-        rect = pygame.draw.line(settings.screen, settings.white, 
+        rect = pygame.draw.line(settings.screen, stk.color, 
                                 start, stop, 1)
         dirty_rects.append(rect) 
     return dirty_rects
