@@ -11,7 +11,7 @@ old_mess = []
 
 def main():
     # create window
-    settings.disp_dim = (1024, 855)
+    settings.disp_dim = (1024, 750)
     
 
     stick_man = stick_manager()
@@ -36,12 +36,12 @@ def main():
     fps_clock = pygame.time.Clock()
     settings.screen.fill( settings.black )
     
-    settings.fps_dest = (10 ,830)
+    settings.fps_dest = (10 , settings.disp_dim[1] - 20)
     settings.screen.blit(settings.fps_surf, settings.fps_dest)
     count = 0
     # main loop
     while True:
-        colliders = settings.map_man.sightDistance(special_bug,
+        colliders = settings.map_man.getColliders(special_bug,
                                                    special_direction)
         for stk in colliders:
             stk.color = (50, 100, 255)
