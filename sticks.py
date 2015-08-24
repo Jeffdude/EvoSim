@@ -132,10 +132,10 @@ class stick_manager:
             self.sticks.append(new_stick)
         if settings.debug > 2:
             if num_sticks > 1:
-                s_bool = True
+                s_char = 's'
             else:
-                s_bool = False
-            print(">>  Spawned {} stick{}".format(num_sticks, s_bool))
+                s_char = ''
+            print(">>  Spawned {} stick{}".format(num_sticks, s_char))
 
     def getSticks(self):
         return self.sticks
