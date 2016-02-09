@@ -51,15 +51,35 @@ class map_manager:
         bug_x, bug_y = bug.location
         if direction > 0 and direction < 180:
             looking_up = True
-        for stk in self.getColliders(bug, direction):
+        else:
+            looking_up = False
+        bug_b = bug_y - direction * bug_x # b = y - m*x
+        int_pnts = []
+        colliders = self.getColliders(bug, direction)
+        for stk in colliders:
 
             # filter the colliders on opposite side of vision
-            if stk.location[1] + stk.length > bug_y and not looking_up:
+            if stk.location[1] + (stk.length / 2) > bug_y and looking_up:
                 continue
-            elif stk.location[1] - stk.length < bug_y and looking_up:
+            elif stk.location[1] - (stk.length / 2) < bug_y and not looking_up:
                 continue
 
             stk_dict = stk.getDimensions()
             start_x, start_y = stk_dict['start']
             stop_x, stop_y = stk_dict['stop']
-            stk_slope = 0
+            stk_slope = (start_y - stop_y) / (start_x - stop_x)
+            stk_b = start_y - stk_slope * start_x  # b = y - m * x
+            """
+            m1*x + b1 = m2*x + b2
+                b2 - b1 = (m1 - m2)x
+                x = (b2 - b1)/(m1 - m2)
+            (y - b1)/m1 = (y - b2)/m2 
+                y - b1 = (y - b2)(m1/m2)
+                y - y(m1/m2) = b1 - b2(m1/m2)
+                y = (b1 - b2)/(1 - m1/m2) * (m1/m2)
+            """
+            int_x = (stk_b - bug_b) / (direction - stk_slope)
+            int_y = ((stk_b - bug_b) / (1 - direction/stk_slope)) \
+                        * (direction / stk_slope)
+            int_pnts.append((int(int_x), int(int_y)))
+        return (int_pnts, colliders)

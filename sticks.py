@@ -56,6 +56,16 @@ class stick:
             return False
 
     def getDimensions(self):
+        """
+        returns a dictionary of helpful information
+            caveat: moderately high constant time computation
+            note: will only recompute once per tick
+
+        height: the absolute height along the y-axis
+        width: the absolute width along the x-axis
+        start: tuple of coordinates of the highest end of the stick
+        stop: tuple of coordinates of the lowest end of the stick
+        """
         if self.dim_dict is None:
             height = (self.length / 2.0) * math.sin(self.rotation)
             width = (self.length / 2.0) * math.cos(self.rotation)
@@ -130,7 +140,7 @@ class stick_manager:
         for x in range(num_sticks):
             new_stick = stick()
             self.sticks.append(new_stick)
-        if settings.debug > 2:
+        if settings.debug > 2 and False:
             if num_sticks > 1:
                 s_char = 's'
             else:

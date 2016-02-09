@@ -9,6 +9,8 @@ from map_manager import map_manager  # entity management
 
 old_mess = []
 
+special_bug = bug(location=(512,427))
+special_direction = 0.785
 def main():
     # create window
     settings.disp_dim = (1024, 750)
@@ -25,8 +27,6 @@ def main():
                     lspeed=0, rspeed=0, length=1000.0,
                     color=(255,100,100))
     stick_man.getSticks().append(special_stk)
-    special_bug = bug(location=(512,427))
-    special_direction = 0.785
 
     render.initWindow()
     sys_font = pygame.font.SysFont(None, 25)
@@ -41,13 +41,7 @@ def main():
     count = 0
     # main loop
     while True:
-        colliders = settings.map_man.getColliders(special_bug,
-                                                   special_direction)
-        for stk in colliders:
-            stk.color = (50, 100, 255)
         loop()
-        for stk in colliders:
-            stk.color = settings.white
         fps_clock.tick()
         count += 1
         if count >= 15:
@@ -61,12 +55,24 @@ def main():
                 return
 
 def loop():
+    # debug
+    global special_bug
+    global special_direction
+    (collision_pnts, colliders) = settings.map_man.sightDistance(
+                                                    special_bug,
+                                                    special_direction)
+    for stk in colliders:
+        stk.color = (50, 100, 255)
+    render.drawPoints(collision_pnts)
     settings.map_man.tick()
     settings.screen.fill( settings.black )
     t_sticks = settings.map_man.stick_man.getSticks()
     render.drawSticks( t_sticks )
     settings.screen.blit(settings.fps_surf, settings.fps_dest)
     pygame.display.update()
+
+    for stk in colliders:
+        stk.color = settings.white
 
 
 if __name__ == '__main__':
