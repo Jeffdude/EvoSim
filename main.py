@@ -63,9 +63,9 @@ def loop():
                                                     special_direction)
     for stk in colliders:
         stk.color = (50, 100, 255)
-    render.drawPoints(collision_pnts)
     settings.map_man.tick()
     settings.screen.fill( settings.black )
+    render.drawPoints(collision_pnts)
     t_sticks = settings.map_man.stick_man.getSticks()
     render.drawSticks( t_sticks )
     settings.screen.blit(settings.fps_surf, settings.fps_dest)

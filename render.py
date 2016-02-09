@@ -4,6 +4,7 @@ import settings  # access globals
 from sticks import stick, stick_manager
 import matplotlib.pyplot as plt
 import math
+
 # ------------------------------------------------------------------------------
 # Setting up the window
 # ------------------------------------------------------------------------------
@@ -53,7 +54,7 @@ def drawSticks(sticks, color=settings.white):
         dirty_rects.append(rect) 
     return dirty_rects
 
-def drawPoints(coordinates, color=settings.red):
+def drawPoints(coordinates, color=settings.yellow):
     """
     helper function for debugging collision points
     coordinate is a list of tuples, (x,y), of points to be drawn
@@ -61,7 +62,7 @@ def drawPoints(coordinates, color=settings.red):
     dirty_rects = []
     for coord in coordinates:
         print("~ Placed debug point at {}".format(str(coord)))
-        rect = pygame.draw.circle(settings.screen, color, coord, 10)
+        rect = pygame.draw.circle(settings.screen, color, coord, 15, 0)
         dirty_rects.append(rect)
 
     return dirty_rects

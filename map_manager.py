@@ -24,9 +24,12 @@ class map_manager:
         """
 
         bug_x, bug_y = bug.location
-        bug_slope = - math.sin(direction) / math.cos(direction)
+        bug_slope = - math.tan(direction)
         colliders = []
-        for stk in self.stick_man.aggregatePoints():
+        for stk_id in self.stick_man.aggregatePoints():
+
+            # retrieve stk info by unique identifier
+            stk = self.stick_man.aggregatePoints()[stk_id]
 
             dx_start = stk.get('start')[0] - bug_x
             dx_stop = stk.get('stop')[0] - bug_x
@@ -49,37 +52,43 @@ class map_manager:
         """
 
         bug_x, bug_y = bug.location
-        if direction > 0 and direction < 180:
+        v_slope = - math.tan(direction) 
+        if v_slope < 0:
             looking_up = True
         else:
             looking_up = False
-        bug_b = bug_y - direction * bug_x # b = y - m*x
+        """
+        if direction > 0 and direction < math.pi:
+            looking_up = True
+        else:
+            looking_up = False
+        """
+        bug_b = bug_y - v_slope * bug_x # b = y - m*x
         int_pnts = []
+        stk_details = self.stick_man.aggregatePoints()
         colliders = self.getColliders(bug, direction)
         for stk in colliders:
 
             # filter the colliders on opposite side of vision
-            if stk.location[1] + (stk.length / 2) > bug_y and looking_up:
-                continue
-            elif stk.location[1] - (stk.length / 2) < bug_y and not looking_up:
-                continue
+            if (stk.location[1] + (stk.length / 2)) > bug_y and looking_up:
+                continue # skip
+            elif (stk.location[1] - (stk.length / 2)) < bug_y and not looking_up:
+                continue # skip
 
-            stk_dict = stk.getDimensions()
+            stk_dict = stk_details[stk.id]
             start_x, start_y = stk_dict['start']
             stop_x, stop_y = stk_dict['stop']
-            stk_slope = (start_y - stop_y) / (start_x - stop_x)
+            stk_slope = float(start_y - stop_y) / float(start_x - stop_x)
             stk_b = start_y - stk_slope * start_x  # b = y - m * x
             """
+            insections of vision and stick
+
             m1*x + b1 = m2*x + b2
                 b2 - b1 = (m1 - m2)x
                 x = (b2 - b1)/(m1 - m2)
-            (y - b1)/m1 = (y - b2)/m2 
-                y - b1 = (y - b2)(m1/m2)
-                y - y(m1/m2) = b1 - b2(m1/m2)
-                y = (b1 - b2)/(1 - m1/m2) * (m1/m2)
             """
-            int_x = (stk_b - bug_b) / (direction - stk_slope)
-            int_y = ((stk_b - bug_b) / (1 - direction/stk_slope)) \
-                        * (direction / stk_slope)
+            int_x = float(stk_b - bug_b) / float(v_slope - stk_slope)
+            int_y = bug_b + v_slope * int_x
+            #int_y = stk_b + stk_slope * int_x
             int_pnts.append((int(int_x), int(int_y)))
         return (int_pnts, colliders)

@@ -2,7 +2,6 @@ import settings
 import random
 import math
 
-
 class stick:
     def __init__(self, location=None, rotation=None, lspeed=None, rspeed=None,
                  max_length=130.0, min_length=80.0, length=None, color=None):
@@ -44,6 +43,10 @@ class stick:
             self.color = color
 
         self.dim_dict = None
+
+        # stick unique identifier
+        self.id = settings.stk_id
+        settings.stk_id += 1
     
     def tick(self):
         self.dim_dict = None
@@ -116,19 +119,22 @@ class stick_manager:
                     doomed.append(stk)
         for stk in doomed:
             self.sticks.remove(stk)
+
+        # save random state
         self.randState = random.getstate()
+        # reset detail cache
         self.pointMap = None
 
     def aggregatePoints(self):
 
         if self.pointMap is None:
-            self.pointMap = []
+            self.pointMap = {}
             for stk in self.sticks:
                 dims = stk.getDimensions()
                 data = {'start': dims.get('start'), 
                         'stop': dims.get('stop'),
                         'stick': stk }
-                self.pointMap.append(data)
+                self.pointMap[stk.id] = data
 
         return self.pointMap
 
