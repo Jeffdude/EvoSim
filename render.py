@@ -54,15 +54,16 @@ def drawSticks(sticks, color=settings.white):
         dirty_rects.append(rect) 
     return dirty_rects
 
-def drawPoints(coordinates, color=settings.yellow):
+def drawPoints(coordinates, radias=None, color=settings.yellow):
     """
     helper function for debugging collision points
     coordinate is a list of tuples, (x,y), of points to be drawn
     """
     dirty_rects = []
+    if radias is None:
+        radias=10
     for coord in coordinates:
-        print("~ Placed debug point at {}".format(str(coord)))
-        rect = pygame.draw.circle(settings.screen, color, coord, 15, 0)
+        rect = pygame.draw.circle(settings.screen, color, coord, radias, 0)
         dirty_rects.append(rect)
 
     return dirty_rects
