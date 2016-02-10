@@ -4,7 +4,8 @@ import math
 
 class stick:
     def __init__(self, location=None, rotation=None, lspeed=None, rspeed=None,
-                 max_length=130.0, min_length=80.0, length=None, color=None):
+                 max_length=130.0, min_length=80.0, length=None, color=None,
+                 id=None):
         if location is None:
             edgebuf = max_length / 2.0
             min_loc = edgebuf
@@ -45,8 +46,11 @@ class stick:
         self.dim_dict = None
 
         # stick unique identifier
-        self.id = settings.stk_id
-        settings.stk_id += 1
+        if id is None:
+            self.id = settings.stk_id
+            settings.stk_id += 1
+        else:
+            self.id = id
     
     def tick(self):
         self.dim_dict = None
@@ -155,3 +159,5 @@ class stick_manager:
 
     def getSticks(self):
         return self.sticks
+    def getStickById(self, id):
+        return self.aggregatePoints()[id]['stick']
