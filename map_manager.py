@@ -53,6 +53,7 @@ class map_manager:
 
         bug_x, bug_y = bug.location
         v_slope = - math.tan(direction) 
+        """
         if v_slope < 0:
             looking_up = True
         else:
@@ -62,7 +63,6 @@ class map_manager:
             looking_up = True
         else:
             looking_up = False
-        """
         bug_b = bug_y - v_slope * bug_x # b = y - m*x
         int_pnts = []
         stk_details = self.stick_man.aggregatePoints()
