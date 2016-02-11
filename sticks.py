@@ -137,6 +137,8 @@ class stick_manager:
                 dims = stk.getDimensions()
                 data = {'start': dims.get('start'), 
                         'stop': dims.get('stop'),
+                        'height': dims.get('height'),
+                        'width': dims.get('width'),
                         'stick': stk }
                 self.pointMap[stk.id] = data
 
@@ -159,5 +161,6 @@ class stick_manager:
 
     def getSticks(self):
         return self.sticks
+
     def getStickById(self, id):
         return self.aggregatePoints()[id]['stick']

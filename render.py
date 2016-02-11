@@ -54,16 +54,42 @@ def drawSticks(sticks, color=settings.white):
         dirty_rects.append(rect) 
     return dirty_rects
 
-def drawPoints(coordinates, radias=None, color=settings.yellow):
+def drawPoints(coordinates, radias=10, color=settings.yellow):
     """
     helper function for debugging collision points
     coordinate is a list of tuples, (x,y), of points to be drawn
     """
     dirty_rects = []
-    if radias is None:
-        radias=10
     for coord in coordinates:
         rect = pygame.draw.circle(settings.screen, color, coord, radias, 0)
         dirty_rects.append(rect)
 
     return dirty_rects
+
+def drawVisionRay(origin, direction, length, color=settings.red):
+    """
+    helper function for viewing the bug's vision rays
+    origin: a tuple (x,y) of the origin of the vision
+    direction: angle of vision in radias
+    length: the distance of vision ray
+    """
+    tip_x = length * math.cos(direction) + origin[0]
+    tip_y = length * math.sin(direction) + origin[1]
+    dirty_rect = pygame.draw.line(settings.screen, 
+            color, origin, (tip_y, tip_x))
+    return [dirty_rect]
+
+def drawBugs(bugs):
+    """
+    draw all bugs
+    bugs: list of bugs to be draw/redrawn
+    returns a list of dirty rectangles to be updated
+    """
+    dirty_rects = []
+    for bug in bugs:
+        dirty_rects += drawPoints([bug.location])
+        for eye in bug.eyes:
+            dirty_rects += drawVisionRay(bug.location, eye.direction, eye.length)
+
+    return dirty_rects
+

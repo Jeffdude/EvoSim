@@ -1,5 +1,7 @@
 import math
+import time
 import settings
+import render
 
 class map_manager:
     """
@@ -15,7 +17,16 @@ class map_manager:
     def tick(self):
         self.stick_man.tick()
         #self.bug_man.tick()
-    def getColliders(self, bug, direction):
+
+    def drawWorld(self):
+        """
+        aggregation function to draw all the the bugs
+        and sticks of the world
+        """
+        render.drawSticks(self.stick_man.getSticks())
+        render.drawBugs(self.bug_man.getBugs())
+
+    def getColliders(self, bug, direction, getId=False):
         """
         returns list of sticks intersected by bugs vision vector
 
@@ -26,6 +37,7 @@ class map_manager:
         bug_x, bug_y = bug.location
         bug_slope = - math.tan(direction)
         colliders = []
+        colliders_id = []
         for stk_id in self.stick_man.aggregatePoints():
 
             # retrieve stk info by unique identifier
@@ -36,12 +48,22 @@ class map_manager:
             if (stk.get('start')[1] > bug_slope * dx_start + bug_y
                 and stk.get('stop')[1] < bug_slope * dx_stop + bug_y):
                    # collision into stick with rotation < direction
-                   colliders.append(stk.get('stick'))
+                   if getId:
+                       colliders_id.append(stk_id)
+                   else:
+                       colliders.append(stk.get('stick'))
             elif (stk.get('start')[1] < bug_slope * dx_start + bug_y
                 and stk.get('stop')[1] > bug_slope * dx_stop + bug_y):
                    # collision into stick with rotation > direction
-                   colliders.append(stk.get('stick'))
-        return colliders
+                   if getId:
+                       colliders_id.append(stk_id)
+                   else:
+                       colliders.append(stk.get('stick'))
+
+        if getId:
+            return colliders_id
+        else:
+            return colliders
 
     def sightDistance(self, bug, direction):
         """
@@ -53,29 +75,39 @@ class map_manager:
 
         bug_x, bug_y = bug.location
         v_slope = - math.tan(direction) 
-        """
-        if v_slope < 0:
-            looking_up = True
-        else:
-            looking_up = False
-        """
+
         if direction > 0 and direction < math.pi:
             looking_up = True
         else:
             looking_up = False
+
+        if ((direction < (math.pi / 2.0) and direction >= 0)
+            or (direction <= (2 * math.pi) 
+                and direction > ((3.0 * math.pi) / 2.0))):
+            looking_right = True
+        else:
+            looking_right = False
+
         bug_b = bug_y - v_slope * bug_x # b = y - m*x
         int_pnts = []
         stk_details = self.stick_man.aggregatePoints()
-        colliders = self.getColliders(bug, direction)
-        for stk in colliders:
+        colliders_id = self.getColliders(bug, direction, getId=True)
+        for stk_id in colliders_id:
+
+            stk_dict = stk_details[stk_id]
+            stk = stk_dict['stick']
 
             # filter the colliders on opposite side of vision
-            if (stk.location[1] + (stk.length / 2)) > bug_y and looking_up:
+            if ((stk.location[1] - stk_dict['height']) > bug_y 
+                    and looking_up):
                 continue # skip
-            elif (stk.location[1] - (stk.length / 2)) < bug_y and not looking_up:
+            elif (stk.location[1] + stk_dict['height']) < bug_y and not looking_up:
                 continue # skip
 
-            stk_dict = stk_details[stk.id]
+            # skip debug stick
+            if stk_id is 0:
+                continue
+
             start_x, start_y = stk_dict['start']
             stop_x, stop_y = stk_dict['stop']
             stk_slope = float(start_y - stop_y) / float(start_x - stop_x)
@@ -91,4 +123,12 @@ class map_manager:
             int_y = bug_b + v_slope * int_x
             #int_y = stk_b + stk_slope * int_x
             int_pnts.append((int(int_x), int(int_y)))
-        return (int_pnts, colliders)
+        new_pnts = []
+        for pnt_x, pnt_y in int_pnts:
+            if (((pnt_y > bug_y) and looking_up)
+                or ((pnt_y < bug_y) and not looking_up)
+                or ((pnt_x < bug_x) and looking_right)
+                or ((pnt_x > bug_x) and not looking_right)):
+                    continue
+            new_pnts.append((pnt_x, pnt_y))
+        return (new_pnts, colliders_id)

@@ -24,14 +24,14 @@ def main():
                                    bug_man = bug_man)
     # spawn initial sticks
     # debug
-    special_stk = stick(location=(512, 427),
-                    rotation=special_direction, 
-                    lspeed=0, rspeed=0, length=1000.0,
-                    color=(255,100,100), id=0)
+    #special_stk = stick(location=(512, 427),
+    #                rotation=special_direction, 
+    #                lspeed=0, rspeed=0, length=1000.0,
+    #                color=(255,100,100), id=0)
     settings.stk_id += 1
 
     stick_man.spawnSticks(2)
-    stick_man.getSticks().append(special_stk)
+    #stick_man.getSticks().append(special_stk)
 
     render.initWindow()
     sys_font = pygame.font.SysFont(None, 25)
@@ -63,25 +63,39 @@ def loop():
     # debug
     global special_bug
     global special_direction
-    (collision_pnts, colliders) = settings.map_man.sightDistance(
+
+    # first update the object locations
+    settings.map_man.tick()
+    settings.screen.fill( settings.black )
+    (collision_pnts, colliders_id) = settings.map_man.sightDistance(
                                                     special_bug,
                                                     special_direction)
     special_direction = (special_direction + 0.01) % (2 * math.pi)
     special_stk = settings.map_man.stick_man.getStickById(0)
     special_stk.rotation = special_direction
 
-    settings.map_man.tick()
-    settings.screen.fill( settings.black )
+    # debug color of colliders
+    for stk_id in colliders_id:
+        if stk_id != 0:
+            stk = settings.map_man.stick_man.getStickById(stk_id)
+            stk.color = settings.blue
+
 
     # debug: drawing collision points/debug bug
-    render.drawPoints(collision_pnts)
     render.drawPoints([special_bug.location], radias=20, color=settings.red)
+    render.drawPoints(collision_pnts)
 
     # drawing sticks
     t_sticks = settings.map_man.stick_man.getSticks()
     render.drawSticks( t_sticks )
     # drawing fps display
     settings.screen.blit(settings.fps_surf, settings.fps_dest)
+
+    # reset debug color of colliders
+    for stk_id in colliders_id:
+        if stk_id != 0: 
+            stk = settings.map_man.stick_man.getStickById(stk_id)
+            stk.color = settings.white
 
     pygame.display.update()
 
