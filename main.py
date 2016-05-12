@@ -11,7 +11,8 @@ from map_manager import map_manager  # entity management
 old_mess = []
 
 special_bug = bug(location=(512,427))
-special_direction = 2.356
+#special_direction = special_bug.eyes['0'].direction
+#special_direction = 2.356
 #0.785
 def main():
     # create window
@@ -20,6 +21,7 @@ def main():
 
     stick_man = stick_manager(density=0.9, max_num=20)
     bug_man = bug_manager()
+    bug_man.addBug(special_bug)
     settings.map_man = map_manager(stick_man = stick_man,
                                    bug_man = bug_man)
     # spawn initial sticks
@@ -28,7 +30,7 @@ def main():
     #                rotation=special_direction, 
     #                lspeed=0, rspeed=0, length=1000.0,
     #                color=(255,100,100), id=0)
-    settings.stk_id += 1
+    #settings.stk_id += 1
 
     stick_man.spawnSticks(2)
     #stick_man.getSticks().append(special_stk)
@@ -47,12 +49,14 @@ def main():
     # main loop
     while True:
         loop()
+        # for fps clock
         fps_clock.tick()
         count += 1
         if count >= 15:
             cur_fps = int(fps_clock.get_fps())
             settings.fps_surf = sys_font.render("fps: " + str(cur_fps), False, settings.white)
             count = 0
+        # quit event 
         for event in pygame.event.get():
             if event.type == QUIT:
                 return
@@ -60,31 +64,38 @@ def main():
                 return
 
 def loop():
+    """
+    main loop of program execution
+    """
     # debug
     global special_bug
-    global special_direction
 
     # first update the object locations
     settings.map_man.tick()
     settings.screen.fill( settings.black )
+    sb_direction = special_bug.eyes[0].direction 
     (collision_pnts, colliders_id) = settings.map_man.sightDistance(
                                                     special_bug,
-                                                    special_direction)
-    special_direction = (special_direction + 0.01) % (2 * math.pi)
-    special_stk = settings.map_man.stick_man.getStickById(0)
-    special_stk.rotation = special_direction
+                                                    sb_direction)
+    #special_bug.eyes[0].direction = ((sb_direction + 0.01) %
+    #                                   (2 * math.pi))
+
+#    special_stk = settings.map_man.stick_man.getStickById(0)
+#    special_stk.rotation = special_direction
 
     # debug color of colliders
     for stk_id in colliders_id:
-        if stk_id != 0:
-            stk = settings.map_man.stick_man.getStickById(stk_id)
-            stk.color = settings.blue
+        stk = settings.map_man.stick_man.getStickById(stk_id)
+        stk.color = settings.blue
 
 
     # debug: drawing collision points/debug bug
-    render.drawPoints([special_bug.location], radias=20, color=settings.red)
+    # render.drawPoints([special_bug.location], radias=20, color=settings.red)
     render.drawPoints(collision_pnts)
 
+    # drawing bugs
+    bugs = settings.map_man.bug_man.getBugs()
+    render.drawBugs(bugs)
     # drawing sticks
     t_sticks = settings.map_man.stick_man.getSticks()
     render.drawSticks( t_sticks )
@@ -93,9 +104,8 @@ def loop():
 
     # reset debug color of colliders
     for stk_id in colliders_id:
-        if stk_id != 0: 
-            stk = settings.map_man.stick_man.getStickById(stk_id)
-            stk.color = settings.white
+        stk = settings.map_man.stick_man.getStickById(stk_id)
+        stk.color = settings.white
 
     pygame.display.update()
 
