@@ -32,12 +32,17 @@ class bug:
             self.eye_count = 0
             self.eyes = {}
             for eye in eyes:
-                self.eyes[self.eye_count: eye]
+                self.eyes[self.eye_count] = eye
                 self.eye_count += 1
 
 
 
 class bug_eye:
+    """
+    bug_eye: eye object for bugs
+    direction: the direction the eye is pointing in radians
+    length: the max length of the eye's sight vision
+    """
     def __init__(self, direction=None, length=250):
         self.length = length
         if direction is None:
