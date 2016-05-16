@@ -5,12 +5,16 @@ import settings              # access globals
 import render                # rendering utils
 import time                  # loop timing
 from sticks import stick, stick_manager
-from bugs import bug, bug_manager
+from bugs import bug, bug_eye, bug_manager
 from map_manager import map_manager  # entity management
 
 old_mess = []
 
-special_bug = bug(location=(512,427))
+special_eyes = []
+for n in range(2):
+    eye = bug_eye()
+    special_eyes.append(eye)
+special_bug = bug(location=(512,427), eyes=special_eyes)
 #special_direction = special_bug.eyes['0'].direction
 #special_direction = 2.356
 #0.785
@@ -73,25 +77,19 @@ def loop():
     # first update the object locations
     settings.map_man.tick()
     settings.screen.fill( settings.black )
-    sb_direction = special_bug.eyes[0].direction 
-    (collision_pnts, colliders_id) = settings.map_man.sightDistance(
-                                                    special_bug,
-                                                    sb_direction)
-    #special_bug.eyes[0].direction = ((sb_direction + 0.01) %
-    #                                   (2 * math.pi))
+    sb0_direction = special_bug.eyes[0].direction 
+    sb1_direction = special_bug.eyes[1].direction 
 
-#    special_stk = settings.map_man.stick_man.getStickById(0)
-#    special_stk.rotation = special_direction
+    distance, new_pnts, _ = settings.map_man.sightDistances(special_bug)
 
-    # debug color of colliders
-    for stk_id in colliders_id:
-        stk = settings.map_man.stick_man.getStickById(stk_id)
-        stk.color = settings.blue
-
+    # rotate vision
+    special_bug.eyes[0].direction += 0.01 
+    special_bug.eyes[0].direction %= (2 * math.pi)
+    special_bug.eyes[1].direction -= 0.01 
+    special_bug.eyes[1].direction %= (2 * math.pi)
 
     # debug: drawing collision points/debug bug
-    # render.drawPoints([special_bug.location], radias=20, color=settings.red)
-    render.drawPoints(collision_pnts)
+    render.drawPoints(new_pnts)
 
     # drawing bugs
     bugs = settings.map_man.bug_man.getBugs()
@@ -101,11 +99,6 @@ def loop():
     render.drawSticks( t_sticks )
     # drawing fps display
     settings.screen.blit(settings.fps_surf, settings.fps_dest)
-
-    # reset debug color of colliders
-    for stk_id in colliders_id:
-        stk = settings.map_man.stick_man.getStickById(stk_id)
-        stk.color = settings.white
 
     pygame.display.update()
 
