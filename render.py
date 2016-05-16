@@ -91,6 +91,4 @@ def drawBugs(bugs):
         for eye_id in bug.eyes:
             eye = bug.eyes[eye_id]
             dirty_rects += drawVisionRay(bug.location, eye.direction, eye.length)
-
     return dirty_rects
-

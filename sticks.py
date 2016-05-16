@@ -70,8 +70,8 @@ class stick:
 
         height: the absolute height along the y-axis
         width: the absolute width along the x-axis
-        start: tuple of coordinates of the highest end of the stick
-        stop: tuple of coordinates of the lowest end of the stick
+        start: tuple of coordinates of the highest (lowest y-value) end of the stick
+        stop: tuple of coordinates of the lowest (highest y-value)end of the stick
         """
         if self.dim_dict is None:
             height = (self.length / 2.0) * math.sin(self.rotation)
