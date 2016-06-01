@@ -35,7 +35,52 @@ class bug:
                 self.eyes[self.eye_count] = eye
                 self.eye_count += 1
 
+    def moveRandom(self, distance=5):
+        """
+        Bug moves randomly in one of the four cardinal directions
+        """
+        rand = random.random()
+        if rand < 0.25:
+            self.moveUp(distance=distance)
+        elif rand < 0.5:
+            self.moveDown(distance=distance)
+        elif rand < 0.75:
+            self.moveRight(distance=distance)
+        else:
+            self.moveLeft(distance=distance)
 
+
+
+    def moveUp(self, distance=5):
+        """
+        Bug moves up (-y) distance pixels
+        """
+        self.location = tuple(map(lambda x, y: x + y, self.location,
+            (0, -1*distance)))
+        return
+
+    def moveDown(self, distance=5):
+        """
+        Bug moves down (+y) distance pixels
+        """
+        self.location = tuple(map(lambda x, y: x + y, self.location,
+            (0, 1*distance)))
+        return
+
+    def moveRight(self, distance=5):
+        """
+        Bug moves right (+x) distance pixels
+        """
+        self.location = tuple(map(lambda x, y: x + y, self.location,
+            (1*distance, 0)))
+        return
+    def moveLeft(self, distance=5):
+        """
+        Bug moves left (-x) distance pixels
+        """
+        self.location = tuple(map(lambda x, y: x + y, self.location,
+            (-1*distance, 0)))
+        return
 
 class bug_eye:
     """
