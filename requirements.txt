@@ -1,0 +1,6 @@
+pygame
+numpy
+scipy
+scikit-neuralnetwork
+pyparsing
+matplotlib
