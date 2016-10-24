@@ -5,7 +5,7 @@ import render
 
 class map_manager:
     """
-    Monitors interactions b/w sticks and bugs
+    Manages interactions b/w sticks and bugs
     
     in charge of bugs senses and of killing them after collisions
     """
@@ -16,7 +16,7 @@ class map_manager:
 
     def tick(self):
         self.stick_man.tick()
-        #self.bug_man.tick()
+        self.bug_man.tick()
 
     def drawWorld(self):
         """
@@ -135,19 +135,25 @@ class map_manager:
         return math.sqrt(dsquared)
 
 
-    def sightDistances(self, bug):
+    def sightDistances(self, bug, eye_id=None):
         """
         returns dict of mappings of the bug's eye ID and floating point
         representations of the distance to the nearest stick within the vision
         vector of each
 
-        if the eye_id does not see anything in it's range, it's distance value
+        if the eye_id does not see anything in its range, its distance value
         will be -1
         """
         distances = {}
         tot_int_pnts_in_range = []
         tot_colliders_id = []
-        for eye_id in bug.eyes.keys():
+        eye_ids = []
+        # single eye mode
+        if eye_id is not None:
+            eye_ids = [eye_id]
+        else:
+            eye_ids = bug.eyes.keys()
+        for eye_id in eye_ids:
             eye = bug.eyes[eye_id]
             min_distance = float('inf')
             # check the intercept points for the closest
@@ -168,4 +174,4 @@ class map_manager:
             tot_int_pnts_in_range += int_pnts_in_range
             tot_colliders_id += colliders_id
         return (distances, tot_int_pnts_in_range, tot_colliders_id)
-                
+
